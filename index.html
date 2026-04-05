@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Travel Chess – Chess Puzzles on the Go</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #f0ede8;
+      --dark: #1a1410;
+      --brown: #5c3d2e;
+      --amber: #d4922a;
+      --light-sq: #f0c98a;
+      --dark-sq: #b5703a;
+      --text: #2d2118;
+      --muted: #8a7060;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 60px,
+          rgba(180,110,60,0.04) 60px,
+          rgba(180,110,60,0.04) 120px
+        );
+      pointer-events: none;
+    }
+
+    .hero-left {
+      padding: 80px 60px 80px 80px;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--amber);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(48px, 6vw, 80px);
+      font-weight: 900;
+      line-height: 1.05;
+      color: var(--dark);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 span {
+      color: var(--amber);
+      position: relative;
+    }
+
+    .hero h1 span::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--amber);
+      opacity: 0.3;
+      border-radius: 2px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 420px;
+      margin-bottom: 44px;
+      font-weight: 300;
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--dark);
+      color: #fff;
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(26,20,16,0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(26,20,16,0.35);
+    }
+
+    .btn-primary svg { width: 20px; height: 20px; }
+
+    .stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(92,61,46,0.15);
+    }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* HERO RIGHT - Screenshot Showcase */
+    .hero-right {
+      height: 100vh;
+      position: relative;
+      background: linear-gradient(135deg, #3d2314 0%, #1a1410 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      animation: fadeIn 1s ease both 0.3s;
+    }
+
+    .hero-right::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 50%, rgba(212,146,42,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(92,61,46,0.3) 0%, transparent 50%);
+    }
+
+    /* Chess board decoration */
+    .board-deco {
+      position: absolute;
+      bottom: -40px;
+      right: -40px;
+      width: 300px;
+      height: 300px;
+      opacity: 0.08;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      transform: rotate(15deg);
+    }
+
+    .board-deco div:nth-child(odd) { background: #fff; }
+    .board-deco div:nth-child(even) { background: transparent; }
+
+    .screenshots-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 40px 30px;
+    }
+
+    .screenshot-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .screenshot-card:hover { transform: translateY(-8px) scale(1.02); }
+
+    .screenshot-card img {
+      display: block;
+      width: 160px;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .screenshot-card.main {
+      width: 190px;
+      transform: translateY(0);
+      z-index: 2;
+    }
+
+    .screenshot-card.main img { width: 190px; }
+
+    .screenshot-card.side {
+      transform: translateY(30px);
+      opacity: 0.85;
+    }
+
+    .screenshot-card.side2 {
+      transform: translateY(-20px);
+      opacity: 0.75;
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 120px 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.15;
+      max-width: 500px;
+      margin-bottom: 64px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+
+    .feature-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid rgba(92,61,46,0.1);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px rgba(92,61,46,0.12);
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--amber);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .feature-icon {
+      font-size: 36px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .feature-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 12px;
+    }
+
+    .feature-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* SCREENSHOTS SECTION */
+    .gallery {
+      background: var(--dark);
+      padding: 100px 80px;
+      overflow: hidden;
+    }
+
+    .gallery .section-label { color: var(--amber); }
+    .gallery .section-title { color: #fff; margin-bottom: 60px; }
+
+    .gallery-scroll {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      padding-bottom: 20px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .gallery-scroll::-webkit-scrollbar { display: none; }
+
+    .gallery-item {
+      flex-shrink: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      width: 200px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      transition: transform 0.3s;
+    }
+
+    .gallery-item:hover { transform: scale(1.04) translateY(-8px); }
+
+    .gallery-item img {
+      width: 100%;
+      display: block;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 48px 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--amber); }
+
+    .footer-copy {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .hero-left {
+        padding: 60px 32px 40px;
+        order: 1;
+      }
+
+      .hero-right {
+        height: 420px;
+        order: 0;
+      }
+
+      .screenshot-card.main img { width: 130px; }
+      .screenshot-card img { width: 110px; }
+
+      .features { padding: 80px 32px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .gallery { padding: 80px 32px; }
+      footer { padding: 40px 32px; flex-direction: column; align-items: flex-start; }
+      .stats { flex-wrap: wrap; gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <span class="badge">♟ Chess Puzzles</span>
+    <h1>Master Chess,<br>One <span>Move</span> at a Time</h1>
+    <p>Hundreds of handcrafted puzzles, from Mate in 1 to complex challenges. Train your mind wherever you are — no internet needed.</p>
+
+    <div class="cta-group">
+      <a href="#" class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+        </svg>
+        Download on App Store
+      </a>
+    </div>
+
+    <div class="stats">
+      <div>
+        <div class="stat-num">200+</div>
+        <div class="stat-label">Chess Puzzles</div>
+      </div>
+      <div>
+        <div class="stat-num">4</div>
+        <div class="stat-label">Board Themes</div>
+      </div>
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Offline Play</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="board-deco">
+      <div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="screenshots-container">
+      <div class="screenshot-card side2">
+        <img src="3.jpg" alt="Hint games" />
+      </div>
+      <div class="screenshot-card main">
+        <img src="1.jpg" alt="Challenge Your Mind" />
+      </div>
+      <div class="screenshot-card side">
+        <img src="2.jpg" alt="Solve chess puzzles" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything you need to sharpen your game</h2>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">🧩</span>
+      <div class="feature-title">Chess Puzzles</div>
+      <p class="feature-desc">Solve hundreds of carefully curated puzzles. From simple Mate in 1 to multi-move combinations that will truly test your skills.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">💡</span>
+      <div class="feature-title">Hint System</div>
+      <p class="feature-desc">Stuck on a puzzle? Use hints to nudge you in the right direction without spoiling the solution. Learn as you play.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎨</span>
+      <div class="feature-title">Multiple Board Themes</div>
+      <p class="feature-desc">Choose from classic wooden, modern minimal, purple royal, and more board styles. Make the game yours.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">✈️</span>
+      <div class="feature-title">Play Anywhere, Offline</div>
+      <p class="feature-desc">No internet? No problem. Travel Chess is fully offline — perfect for commutes, flights, or anywhere in between.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENSHOT GALLERY -->
+<section class="gallery">
+  <div class="section-label">Screenshots</div>
+  <h2 class="section-title">See it in action</h2>
+
+  <div class="gallery-scroll">
+    <div class="gallery-item">
+      <img src="1.jpg" alt="Challenge Your Mind" />
+    </div>
+    <div class="gallery-item">
+      <img src="2.jpg" alt="Solve chess puzzles" />
+    </div>
+    <div class="gallery-item">
+      <img src="3.jpg" alt="Hint games" />
+    </div>
+    <div class="gallery-item">
+      <img src="4.jpg" alt="Edit your chess world" />
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">♟ Travel Chess</div>
+  <ul class="footer-links">
+    <li><a href="privacy-policy.md">Privacy Policy</a></li>
+    <li><a href="mailto:lidyasoftwarehouse@gmail.com">Support</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 Travel Chess. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
