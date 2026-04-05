@@ -32,13 +32,13 @@ Travel Chess is suitable for all ages, including children under 13. Since we do 
 
 ## 6. Changes to This Privacy Policy
 
-We may update this Privacy Policy from time to time. Any changes will be reflected with an updated "Last updated" date at the top of this page. Continued use of the App after changes constitutes acceptance of the updated policy.
+We may update this Privacy Policy from time to time. Any changes will be reflected with an updated "Last updated" date at the top of this page.
 
 ## 7. Contact Us
 
 If you have any questions about this Privacy Policy, please contact us at:
 
-**Email:** [lidyasoftwarehouse@gmail.com]
+**Email:** lidyasoftwarehouse@gmail.com
 
 ---
 
